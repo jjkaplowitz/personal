@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Josh Kaplowitz — Operator • Builder</title>
+  <meta name="description" content="Josh Kaplowitz — nuclear-trained submarine officer, builder, aspiring hard-tech founder (nuclear, semis, space)." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b0c0f;
+      --card:#10121a;
+      --text:#e9ecf1;
+      --muted:#a6adbb;
+      --faint:#6b7280;
+      --line:rgba(255,255,255,.10);
+      --shadow: 0 12px 40px rgba(0,0,0,.45);
+      --radius:16px;
+      --max:1100px;
+    }
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 75% -10%, rgba(99,102,241,.10), transparent 55%),
+                  radial-gradient(1000px 800px at 10% 10%, rgba(16,185,129,.08), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      letter-spacing:-0.01em;
+    }
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ opacity:.92; }
+
+    .wrap{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:32px 20px 80px;
+    }
+
+    /* Top bar */
+    .top{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,12,15,.85), rgba(11,12,15,.45));
+      border-bottom:1px solid var(--line);
+    }
+    .top-inner{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:14px 20px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      justify-content:space-between;
+    }
+    .brand{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      min-width:220px;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background: linear-gradient(135deg, rgba(99,102,241,1), rgba(16,185,129,1));
+      box-shadow:0 0 0 4px rgba(99,102,241,.12);
+    }
+    .brand b{ font-weight:600; }
+    .brand span{
+      color:var(--muted);
+      font-size:13px;
+      display:block;
+      line-height:1.1;
+      margin-top:2px;
+    }
+
+    .nav{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .nav a{
+      font-size:13px;
+      color:var(--muted);
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid transparent;
+    }
+    .nav a:hover{
+      border-color:var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+    }
+
+    /* Hero */
+    .hero{
+      padding:56px 0 28px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:24px;
+      align-items:end;
+    }
+    @media (max-width: 900px){
+      .hero{ grid-template-columns:1fr; }
+    }
+
+    .kicker{
+      color:var(--muted);
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      margin-bottom:14px;
+    }
+    h1{
+      font-size: clamp(44px, 5vw, 72px);
+      line-height:1.0;
+      margin:0 0 18px;
+      letter-spacing:-0.03em;
+      font-weight:600;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.6;
+      max-width:64ch;
+      margin:0 0 22px;
+    }
+    .cta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font-size:13px;
+    }
+    .btn:hover{ background:rgba(255,255,255,.06); }
+    .btn.primary{
+      border-color:transparent;
+      background: linear-gradient(135deg, rgba(99,102,241,.9), rgba(16,185,129,.85));
+      color:#071016;
+      font-weight:600;
+    }
+
+    .sidecard{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.02);
+      border-radius: var(--radius);
+      padding:18px;
+      box-shadow: var(--shadow);
+    }
+    .sidecard .row{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      padding:10px 0;
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .sidecard .row:last-child{ border-bottom:none; padding-bottom:0; }
+    .label{ color:var(--faint); font-size:12px; text-transform:uppercase; letter-spacing:.12em; }
+    .value{ color:var(--text); font-size:13px; text-align:right; }
+
+    /* Sections */
+    section{
+      padding:28px 0;
+      border-top:1px solid var(--line);
+    }
+    .h2{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .h2 h2{
+      font-size:18px;
+      margin:0;
+      font-weight:600;
+      letter-spacing:-0.01em;
+    }
+    .h2 p{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+      max-width:76ch;
+      text-align:right;
+    }
+    @media (max-width: 800px){
+      .h2{ flex-direction:column; align-items:flex-start; }
+      .h2 p{ text-align:left; }
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+    }
+
+    .card{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.02);
+      border-radius: var(--radius);
+      padding:18px;
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+      min-height:110px;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      transition: transform .18s ease;
+      background: rgba(255,255,255,.03);
+    }
+
+    .card .tag{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.02);
+      padding:6px 10px;
+      border-radius:999px;
+      margin-bottom:12px;
+      width:fit-content;
+    }
+    .card h3{
+      margin:0 0 10px;
+      font-size:16px;
+      font-weight:600;
+      letter-spacing:-0.01em;
+    }
+    .card p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+    .meta{
+      margin-top:14px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .pill{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,.08);
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.01);
+    }
+
+    .col-7{ grid-column: span 7; }
+    .col-5{ grid-column: span 5; }
+    .col-6{ grid-column: span 6; }
+    .col-4{ grid-column: span 4; }
+    .col-12{ grid-column: span 12; }
+    @media (max-width: 900px){
+      .col-7,.col-5,.col-6,.col-4{ grid-column: span 12; }
+    }
+
+    /* Timeline */
+    .timeline{ display:grid; gap:10px; }
+    .titem{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      padding:14px 16px;
+      background: rgba(255,255,255,.015);
+    }
+    .trow{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:6px;
+    }
+    .trow b{ font-weight:600; }
+    .trow span{ color:var(--muted); font-size:13px; }
+    .titem p{ margin:0; color:var(--muted); font-size:14px; line-height:1.6; }
+
+    /* Footer */
+    footer{
+      border-top:1px solid var(--line);
+      padding-top:20px;
+      margin-top:30px;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    /* Reveal */
+    .reveal{ opacity:0; transform: translateY(10px); }
+    .reveal.on{ opacity:1; transform:none; transition: opacity .55s ease, transform .55s ease; }
+
+    /* Small utility */
+    .small{ color:var(--faint); font-size:12px; line-height:1.5; margin-top:10px; }
+	.hero-aside{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* Portrait container */
+.hero-photo{
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 18px 55px rgba(0,0,0,.55);
+  background:rgba(255,255,255,.02);
+}
+
+/* Image itself */
+.hero-photo img{
+  width:100%;
+  display:block;
+  object-fit:cover;
+  filter: grayscale(100%) contrast(1.05);
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="top">
+    <div class="top-inner">
+      <div class="brand">
+        <div class="dot"></div>
+        <div>
+          <b>Josh Kaplowitz</b>
+          <span>Operator • Builder</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Primary">
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#projects">Projects</a>
+        <a href="#highlights">Highlights</a>
+        <a href="#focus">Focus</a>
+        <a href="#notes">Notes</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <!-- HERO -->
+    <header class="hero">
+      <div>
+        <div class="kicker">Nuclear Submarine officer • USNA CS • $1M+ RAISED</div>
+        <h1>Building and operating in extreme environments.</h1>
+        <p class="sub">
+          I’m Josh. I drive submarines and operate nuclear reactors in the world's harshest environments, safeguarding national security.
+          I studied computer science in college, built apps I pitched to the Undersecretary of the Navy, Chief of Naval Research,
+		  and Chief of Naval Operations and apps for the private sector, collectively raising over $1M+.
+          I’m building toward a hard-tech company spanning <b>energy</b>, <b>manufacturing</b>, and <b>frontier systems</b>.
+        </p>
+
+        <div class="cta">
+          <a class="btn primary" href="#projects">See projects</a>
+          <a class="btn" href="#contact">Get in touch</a>
+          <!-- Replace placeholders -->
+          <a class="btn" href="https://www.linkedin.com/in/joshua-kaplowitz-22a032170/"; return false;">LinkedIn</a>
+          <a class="btn" href="https://x.com/jjkaplowitz"; return false;">X</a>
+          <a class="btn" href="https://www.instagram.com/kap.lifestyle/?igsh=MWw1c2FseWljamxi&utm_source=qr"; return false;">Instagram</a>
+        </div>
+
+        <div class="small">
+          *This site intentionally keeps operational details high-level. If you’re recruiting, investing, or collaborating,
+          reach out and I’ll share specifics.
+        </div>
+      </div>
+
+      <aside class="hero-aside reveal">
+
+  <!-- Portrait photo -->
+  <div class="hero-photo">
+    <img src="assets/portrait.jpeg" alt="Josh Kaplowitz portrait">
+  </div>
+
+  <!-- Existing sidecard -->
+  <div class="sidecard">
+    <div class="row">
+      <div class="label">Now</div>
+      <div class="value">Active-duty Navy • building leverage daily</div>
+    </div>
+    <div class="row">
+      <div class="label">Path</div>
+      <div class="value">Leave Navy → build full-time</div>
+    </div>
+    <div class="row">
+      <div class="label">North star</div>
+      <div class="value">Nuclear × Space</div>
+    </div>
+    <div class="row">
+      <div class="label">Target</div>
+      <div class="value">2026–2027 launch</div>
+    </div>
+  </div>
+
+</aside>
+
+    </header>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="h2">
+        <h2>About</h2>
+        <p>From garbage truck → enlisted sailor → USNA CS → nuclear submarine officer.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card col-7 reveal">
+          <div class="tag">Operator → Builder</div>
+          <h3>High standards, real systems</h3>
+          <p>
+            I’m Josh Kaplowitz, a nuclear-trained U.S. Navy submarine officer with a computer science background
+            and a track record of shipping in high-consequence environments.
+          </p>
+          <p style="margin-top:10px;">
+            I started as a garbage man, enlisted in the Navy in 2015, worked on the USS GERALD R. FORD
+            maintaining mission-critical networks, and earned an appointment to the U.S. Naval Academy where I studied
+            Computer Science (Class of 2022).
+          </p>
+          <p style="margin-top:10px;">
+            Since then I’ve worked inside Naval Reactors in Washington, DC, completed the nuclear pipeline (power school + prototype),
+            and now lead technical teams on a nuclear-powered submarine. Outside the Navy, I’ve built and launched
+            products, raised early capital, and pitched senior leaders. I’m focused on hard tech (energy, manufacturing,
+            and frontier systems) and I’m building toward a post-Navy transition into launching my own company.
+          </p>
+        </div>
+
+        <div class="card col-5 reveal">
+          <div class="tag">Personal</div>
+          <h3>For fun</h3>
+          <p>
+            I'm a voracious reader, love lifting weights, and traveling. I read everything from Greco-Roman history to Sci-Fi to
+			every type of biography and business book you can think of. Top 3 favorite books are Plutarch's Lives, The Fountainhead and
+			The Twelve Caesars. Just hit 315 on bench and trying to hit 365 in 2026!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK -->
+    <section id="work">
+      <div class="h2">
+        <h2>Work</h2>
+        <p>High-accountability roles. Technical teams. Shipped outcomes.</p>
+      </div>
+
+      <div class="timeline">
+        <div class="titem reveal">
+          <div class="trow">
+            <b>Nuclear Submarine Officer — Machinery / Propulsion (Nuclear) and Tactical Systems (Torpedo and Missile)</b>
+            <span>2024–Present</span>
+          </div>
+		  <div class="trow">
+			<span>KINGS BAY, GA</span>
+		  </div>
+          <p>
+			Lead and developed 30 nuclear mechanics that were responsible for operating and maintaining all the nuclear propulsion
+			and shipboard mechanical systems. I personally oversaw major maintenance on several critical mechanical systems required
+			for reactor safety. Now I lead and train 50 personel across 4 teams in Weapons department to maintain our weapons systems
+			and our tactical skills ready for war. Trained to perform under pressure with strict procedural compliance, disciplined
+			execution, and zero tolerance for sloppiness.
+          </p>
+        </div>
+
+        <div class="titem reveal">
+          <div class="trow">
+            <b>Naval Reactors — Software & Program Execution</b>
+            <span>2022–2023</span>
+          </div>
+		  <div class="trow">
+			<span>WASHINGTON, DC</span>
+		  </div>
+          <p>
+            Built internal tooling and project-management software to improve execution inside a mission-critical organization.
+            Learned how real institutions move: governance, requirements, stakeholder alignment, and delivery.
+          </p>
+        </div>
+
+        <div class="titem reveal">
+          <div class="trow">
+            <b>U.S. Naval Academy — Computer Science</b>
+            <span>2018-2022</span>
+          </div>
+		  <div class="trow">
+			<span>ANNAPOLIS, MD</span>
+		  </div>
+          <p>
+            Computer science foundation with a bias toward building. Entrepreneurship Club President. Skateboarding Club President.
+          </p>
+        </div>
+
+        <div class="titem reveal">
+          <div class="trow">
+            <b>USS GERALD R. FORD (Enlisted) — Shipboard Networks / Operations</b>
+            <span>2015–2017</span>
+          </div>
+		  <div class="trow">
+			<span>NEWPORT NEWS, VA</span>
+		  </div>
+          <p>
+            Maintained and operated major shipboard networks in a high-tempo environment where reliability is the product.
+            Lived with 50 other guys in a bunkroom aboard.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+      <div class="h2">
+        <h2>Selected projects</h2>
+        <p>Concept → momentum → real outcomes. The point is shipping.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card col-6 reveal">
+          <div class="tag">Defense / GovTech</div>
+          <h3>JUNTO — funded Navy program</h3>
+          <p>
+            JUNTO started as a product idea, then became a real program. I built the application, pitched it to senior Navy leadership
+            (including the Undersecretary of the Navy and the CNO in 2020), secured <b>$569K</b> in initial funding, and helped drive it into a
+            <b>million-dollar project</b>.
+          </p>
+          <p style="margin-top:10px;">
+            I learned a lot working on this project and was almost kicked out of the Naval Academy for it. Over the next 2-3 years I led an entire
+			software team based out of Georgia Tech. It was extremely painful to work within the confines of the government procurement rules.
+			When we ran out of money, the team was legally not allowed to work on the app until new funding came which could take a month or more.
+			The project was turned over to someone else and I realized the next project I was going to build was going to be in the private sector.
+          </p>
+        </div>
+
+        <div class="card col-6 reveal">
+          <div class="tag">Consumer / Social</div>
+          <h3>LACE — audio-based social app</h3>
+          <p>
+            Built and launched an audio social product, raised angel investment, and attracted attention from high-profile reporters
+            (CNN / NYT-level). It was a crash course in distribution, retention, and the difference between “cool” and “needed.”
+          </p>
+        </div>
+
+        <div class="card col-7 reveal">
+          <div class="tag">Hard-Tech Thesis</div>
+          <h3>Nuclear × manufacturing scale</h3>
+          <p>
+            I’m building toward a serious hard-tech company post-Navy. The obsession is execution at infrastructure scale:
+            regulation, supply chain, QA, cost curves, and capital formation; not just demos.
+          </p>
+          <p style="margin-top:10px;">
+            I’m particularly interested in nuclear energy (SMRs), industrial manufacturing systems, and adjacent frontier areas like
+            semiconductors and space; arenas where long-term thinking and disciplined execution win.
+          </p>
+        </div>
+
+        <div class="card col-5 reveal">
+          <div class="tag">Fitness</div>
+          <h3>Physical fitness</h3>
+          <p>
+            Strength training is one of my non-negotiables. Discipline in the gym carries into execution everywhere else —
+            it’s the daily proof that I do what I say. I have been working out since I was 16 years old and have always found time
+			whether I was working 100+ hours in shipyard or I was deployed overseas deep in the ocean.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- HIGHLIGHTS -->
+    <section id="highlights">
+      <div class="h2">
+        <h2>Credibility</h2>
+        <p>Fast signal for recruiters, collaborators, and investors.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card col-4 reveal">
+          <div class="tag">Leadership</div>
+          <h3>High consequence operations</h3>
+          <p>
+            I have worked in the most stressful environments in the world. If I mess up, the reactor could be damaged,
+			the submarine could sink, people could die. I thrive in the dark moments.
+          </p>
+        </div>
+
+        <div class="card col-4 reveal">
+          <div class="tag">Build</div>
+          <h3>Funded outcomes</h3>
+          <p>
+            JUNTO secured <b>$569K</b> funding and became a <b>$1M+</b> program after being pitched to senior Navy leadership.
+          </p>
+        </div>
+
+        <div class="card col-4 reveal">
+          <div class="tag">Startup</div>
+          <h3>Real-world traction</h3>
+          <p>
+            Built and launched LACE, raised angels, and built a network that included major reporters.
+          </p>
+        </div>
+
+        <div class="card col-6 reveal">
+          <div class="tag">Trajectory and Ethos</div>
+          <h3>Leave Navy → full-time build</h3>
+          <p>
+            Plan: finish my Navy tour strong, compound leverage (technical depth, credibility, relationships), and build
+			an industrial company that meaningfully advances civilization. I’m not interested in novelty apps or marginal conveniences.
+
+			<p style="margin-top:10px;">
+			I’m focused on physical technologies (energy, manufacturing, and frontier systems) that expand what humanity can do and where it can go.
+			I didn’t start with advantages. I grew up rural, nearly failed out of high school, worked as a garbage man, and enlisted in the Navy
+			because I wanted responsibility and a mission larger than myself. Since then, I’ve lived in more than ten states, traveled extensively,
+			led sailors, and earned the chance to operate and supervise nuclear propulsion systems aboard submarines.
+			I was told not to apply to the Naval Academy because I “wouldn’t get in.” I never expected
+			to become a nuclear engineer responsible for systems where failure is not an option but that responsibility is exactly what I seek.
+			I believe leadership is earned through competence, judgment, and long-term thinking. I know I can do more, and I am building toward
+			becoming a world-class leader in technology and industry.
+			</p>
+          </p>
+        </div>
+
+        <div class="card col-6 reveal">
+          <div class="tag">Principles</div>
+          <h3>Josh 2.0</h3>
+          <p>
+            I am addicated to self-improvement. No victim mindset. I take feedback and embrace embarrassment.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOCUS -->
+    <section id="focus">
+      <div class="h2">
+        <h2>Focus areas</h2>
+        <p>What I’m compounding: technical depth, founder credibility, and high-agency execution.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card col-4 reveal">
+          <div class="tag">Energy</div>
+          <h3>Nuclear</h3>
+          <p>
+            Fundamentals first: electrical theory, mechanics, reactor dynamics, materials, chemistry; then translate that into a
+            wedge that wins in the real world.
+          </p>
+        </div>
+
+        <div class="card col-4 reveal">
+          <div class="tag">Industry</div>
+          <h3>Manufacturing & supply chains</h3>
+          <p>
+            Components, qualification, QA, schedule, cost curves. Physical systems scale when the boring details are mastered.
+          </p>
+        </div>
+
+        <div class="card col-4 reveal">
+          <div class="tag">Frontier</div>
+          <h3>Semis & space</h3>
+          <p>
+            The arenas that reward long-term thinking: compute, energy density, and industrial capability. Hard mode by design.
+          </p>
+        </div>
+
+        <div class="card col-7 reveal">
+          <div class="tag">Operating system</div>
+          <h3>How I work</h3>
+          <p>
+            I’m consistent and have a history of sticking to my mission: 11 years in the Navy, been in the gym over 13 years consistently.
+			My next business I plan to work on for the next 50+ years. I'm in it for the long haul.
+          </p>
+        </div>
+
+        <div class="card col-5 reveal">
+          <div class="tag">Interests</div>
+          <h3>What I read & study</h3>
+          <p>
+            Technology, sci-fi, biographies, business, leadership, classics, and engineering fundamentals. I’m a heavy reader and
+            use history as a training ground for judgment.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="h2">
+        <h2>Contact</h2>
+        <p>If you’re building in hard tech, defense, energy, or industrial systems, I want to meet you.</p>
+      </div>
+
+      <div class="grid">
+        <div class="card col-7 reveal">
+          <div class="tag">Message</div>
+          <h3>Let’s talk</h3>
+          <p>
+            Best way: DM me on IG or X. Include what you’re building, where you’re based, and the fastest path to a meaningful next step.
+          </p>
+          <div class="meta">
+            <!-- <span class="pill">Email: yourname@domain.com</span> -->
+            <span class="pill">Base: East Coast Navy • SV and Gundo orbit</span>
+          </div>
+        </div>
+
+        <div class="card col-5 reveal">
+          <div class="tag">Links</div>
+          <h3>Find me</h3>
+          <p style="margin-bottom:12px;">I'm very active on social media</p>
+          <div class="meta">
+            <a class="btn" href="https://www.linkedin.com/in/joshua-kaplowitz-22a032170/"; return false;">LinkedIn</a>
+          	<a class="btn" href="https://x.com/jjkaplowitz"; return false;">X</a>
+          	<a class="btn" href="https://www.instagram.com/kap.lifestyle/?igsh=MWw1c2FseWljamxi&utm_source=qr"; return false;">Instagram</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <span id="year"></span> Josh Kaplowitz</div>
+      <!-- <div style="color:var(--faint);">Single-file site • fast deploy on GitHub Pages</div> -->
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Reveal on scroll
+    const els = Array.from(document.querySelectorAll('.reveal'));
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
+    }, { threshold: 0.12 });
+    els.forEach(el => io.observe(el));
+  </script>
+</body>
+</html>
