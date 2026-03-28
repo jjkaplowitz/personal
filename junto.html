@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JUNTO — Josh Kaplowitz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #080808;
+    --off-black: #0f0f0f;
+    --card-bg: #111111;
+    --border: rgba(255,255,255,0.08);
+    --white: #f5f4f0;
+    --dim: rgba(245,244,240,0.45);
+    --accent: #c8f55a;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Instrument Serif', serif;
+    --display: 'Bebas Neue', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+  }
+  nav::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+    z-index: -1;
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .nav-logo:hover { opacity: 1; }
+  .back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent); }
+  .back-link svg { transition: transform 0.2s; }
+  .back-link:hover svg { transform: translateX(-4px); }
+
+  /* HERO */
+  .project-hero {
+    min-height: 70vh;
+    min-height: 70svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  /* Photo — swap src="" with your project image */
+  .hero-bg img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: brightness(0.35) grayscale(20%);
+    display: block;
+  }
+  .hero-bg-placeholder {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0a1628 0%, #1a2f4a 50%, #0d1f35 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--dim);
+  }
+  .hero-bg-placeholder svg { opacity: 0.3; }
+  .hero-bg-placeholder span {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.4;
+  }
+  .hero-bg-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.04;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(255,255,255,1) 60px, rgba(255,255,255,1) 61px),
+      repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,1) 60px, rgba(255,255,255,1) 61px);
+  }
+  .hero-content { position: relative; z-index: 1; }
+  .project-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .project-tag::before {
+    content: '';
+    display: block;
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+  .project-title {
+    font-family: var(--display);
+    font-size: clamp(80px, 12vw, 180px);
+    line-height: 0.88;
+    color: var(--white);
+    margin-bottom: 28px;
+  }
+  .project-logline {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(16px, 2vw, 22px);
+    color: rgba(245,244,240,0.7);
+    max-width: 600px;
+    line-height: 1.5;
+  }
+
+  /* META ROW */
+  .meta-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--border);
+  }
+  .meta-cell {
+    padding: 32px 48px;
+    border-right: 1px solid var(--border);
+  }
+  .meta-cell:last-child { border-right: none; }
+  .meta-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 8px;
+  }
+  .meta-value {
+    font-family: var(--display);
+    font-size: 28px;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  /* BODY */
+  .project-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .body-left {
+    padding: 80px 48px;
+    border-right: 1px solid var(--border);
+  }
+  .body-right {
+    padding: 80px 48px;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    display: block;
+    width: 32px; height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  .body-heading {
+    font-family: var(--display);
+    font-size: clamp(36px, 4vw, 56px);
+    line-height: 0.95;
+    color: var(--white);
+    margin-bottom: 32px;
+  }
+  .body-text {
+    font-size: 14px;
+    color: var(--dim);
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+  .body-text strong { color: var(--white); font-weight: 400; }
+
+  /* PROJECT PHOTO PLACEHOLDER */
+  .project-photo {
+    width: 100%;
+    aspect-ratio: 4/3;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+  }
+  /* Swap src="" with your actual project screenshot/image */
+  .project-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-ph {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border: 1px dashed rgba(200,245,90,0.25);
+    background: repeating-linear-gradient(
+      45deg,
+      transparent, transparent 24px,
+      rgba(255,255,255,0.012) 24px, rgba(255,255,255,0.012) 25px
+    );
+  }
+  .photo-ph svg { color: var(--dim); opacity: 0.4; }
+  .photo-ph-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.6;
+  }
+  .photo-ph-hint {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    opacity: 0.4;
+  }
+
+  /* PULL QUOTE */
+  .pull-quote {
+    border-left: 2px solid var(--accent);
+    padding: 20px 24px;
+    margin: 32px 0;
+    background: rgba(200,245,90,0.04);
+  }
+  .pull-quote p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 17px;
+    color: var(--white);
+    line-height: 1.6;
+  }
+
+  /* OUTCOME CARDS */
+  .outcomes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 32px;
+  }
+  .outcome-card {
+    background: var(--card-bg);
+    padding: 28px 24px;
+  }
+  .outcome-num {
+    font-family: var(--display);
+    font-size: 44px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .outcome-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+  }
+
+  /* FOOTER / NAV */
+  .project-footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .next-project {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    text-decoration: none;
+  }
+  .next-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .next-name {
+    font-family: var(--display);
+    font-size: 28px;
+    color: var(--white);
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .next-project:hover .next-name { color: var(--accent); }
+
+  /* FADE IN */
+  /* PROJECT PAGE LOGO */
+  .project-page-logo {
+    position: relative;
+    width: 88px; height: 88px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 32px;
+  }
+  .ppl-ring {
+    position: absolute; inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(200,245,90,0.6) 0%, transparent 45%, rgba(200,245,90,0.2) 70%, transparent 100%);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #fff calc(100% - 2px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #fff calc(100% - 2px));
+    animation: pplSpin 5s linear infinite;
+  }
+  @keyframes pplSpin { to { transform: rotate(360deg); } }
+  .ppl-img {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    position: relative; z-index: 1;
+    box-shadow: 0 0 32px rgba(200,245,90,0.15), 0 4px 20px rgba(0,0,0,0.6);
+    animation: pplPulse 3s ease-in-out infinite;
+  }
+  @keyframes pplPulse {
+    0%,100% { box-shadow: 0 0 32px rgba(200,245,90,0.15), 0 4px 20px rgba(0,0,0,0.6); }
+    50%      { box-shadow: 0 0 48px rgba(200,245,90,0.35), 0 4px 20px rgba(0,0,0,0.6); }
+  }
+  .ppl-svg {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(8,8,8,0.75);
+    border: 1px solid rgba(200,245,90,0.25);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1;
+    animation: pplPulse 3s ease-in-out infinite;
+  }
+  @media (max-width: 600px) {
+    .project-page-logo { width: 64px; height: 64px; margin-bottom: 20px; }
+    .ppl-img, .ppl-svg { width: 52px; height: 52px; }
+  }
+
+  /* PHOTO GRID */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .photo-grid-item {
+    overflow: hidden;
+    aspect-ratio: 3/2;
+    position: relative;
+  }
+  .photo-grid-item.tall {
+    grid-column: span 2;
+    aspect-ratio: 16/7;
+  }
+  .photo-grid-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(10%) brightness(0.88);
+    transition: transform 0.5s cubic-bezier(.25,.46,.45,.94), filter 0.3s;
+  }
+  .photo-grid-item:hover img {
+    transform: scale(1.04);
+    filter: grayscale(0%) brightness(1);
+  }
+  @media (max-width: 600px) {
+    .photo-grid { grid-template-columns: 1fr; }
+    .photo-grid-item.tall { grid-column: span 1; aspect-ratio: 3/2; }
+  }
+
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* MOBILE */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .project-hero { padding: 100px 24px 60px; }
+    .meta-row { grid-template-columns: repeat(2, 1fr); }
+    .meta-cell { padding: 24px; }
+    .project-body { grid-template-columns: 1fr; }
+    .body-left { border-right: none; border-bottom: 1px solid var(--border); padding: 48px 24px; }
+    .body-right { padding: 48px 24px; }
+    .project-footer { padding: 32px 24px; }
+  }
+  @media (max-width: 600px) {
+    .project-title { font-size: 64px; }
+    .meta-row { grid-template-columns: 1fr 1fr; }
+    .meta-cell { padding: 20px 16px; }
+    .meta-value { font-size: 22px; }
+    .outcomes { grid-template-columns: 1fr; }
+    .project-footer { flex-direction: column; gap: 24px; align-items: flex-start; }
+    .next-project { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">J. Kaplowitz</a>
+  <a href="index.html#projects" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 7H2M6 3L2 7l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    All work
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="project-hero">
+  <div class="hero-bg">
+    <img src="_MAX2727.jpeg" alt="Pitching JUNTO to Naval Academy" style="display:block;">
+    <!-- Canvas animation overlaid on top of photo -->
+    <canvas id="junto-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:1;mix-blend-mode:screen;opacity:0.55;pointer-events:none;"></canvas>
+  </div>
+  <div class="hero-content">
+    <div class="project-page-logo">
+      <div class="ppl-ring"></div>
+      <img src="juntoIcon.png" alt="JUNTO logo" class="ppl-img">
+    </div>
+    <div class="project-tag">Defense / GovTech</div>
+    <h1 class="project-title">JUNTO</h1>
+    <p class="project-logline">A Navy-funded software program that started as a product idea and became a $1M+ program — built and pitched from the Naval Academy.</p>
+  </div>
+</div>
+
+<!-- META -->
+<div class="meta-row fade-up">
+  <div class="meta-cell">
+    <div class="meta-label">Funding</div>
+    <div class="meta-value">$1M+</div>
+  </div>
+  <div class="meta-cell">
+    <div class="meta-label">Initial raise</div>
+    <div class="meta-value">$569K</div>
+  </div>
+  <div class="meta-cell">
+    <div class="meta-label">Role</div>
+    <div class="meta-value">Founder</div>
+  </div>
+  <div class="meta-cell">
+    <div class="meta-label">Year</div>
+    <div class="meta-value">2020</div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="project-body">
+
+  <div class="body-left fade-up">
+    <div class="section-label">Overview</div>
+    <h2 class="body-heading">FROM IDEA<br>TO PROGRAM</h2>
+
+    <p class="body-text">
+      JUNTO started as a product idea while I was a midshipman at the Naval Academy. I built the application, pitched it to senior Navy leadership — including the <strong>Undersecretary of the Navy and the Chief of Naval Operations</strong> in 2020 — and secured $569K in initial funding.
+    </p>
+
+    <p class="body-text">
+      The project grew into a <strong>million-dollar program</strong> with a software team based out of Georgia Tech. It was my first real education in navigating government procurement: the legal constraints, funding gaps, and the pace at which bureaucratic institutions actually move.
+    </p>
+
+    <div class="pull-quote">
+      <p>"I was almost kicked out of the Naval Academy for it. That's how I knew it was worth doing."</p>
+    </div>
+
+    <p class="body-text">
+      When the program ran out of money, the team was legally prohibited from working on the app until new funding cleared — sometimes a month or more. The project was eventually transferred to another team. I walked away with a hard-won understanding of what the private sector offers that government never can: speed, ownership, and compounding leverage.
+    </p>
+
+    <div class="outcomes">
+      <div class="outcome-card">
+        <div class="outcome-num">$569K</div>
+        <div class="outcome-label">Initial funding secured</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-num">$1M+</div>
+        <div class="outcome-label">Total program value</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="body-right fade-up">
+    <div class="section-label">On Stage</div>
+
+    <div class="photo-grid">
+      <div class="photo-grid-item tall">
+        <img src="_MAX2727.jpeg" alt="Arena — Pitched JUNTO to Undersecretary of the Navy">
+      </div>
+      <div class="photo-grid-item">
+        <img src="_MAX2717.jpeg" alt="Close-up on stage with mic">
+      </div>
+      <div class="photo-grid-item">
+        <img src="flags.jpeg" alt="Speaking — flags behind">
+      </div>
+      <div class="photo-grid-item">
+        <img src="_MAX2718.jpeg" alt="JUNTO app slide on screen">
+      </div>
+      <div class="photo-grid-item">
+        <img src="_MAX2732.jpeg" alt="Presenting at Naval Academy">
+      </div>
+      <div class="photo-grid-item">
+        <img src="arena.jpeg" alt="Full arena crowd">
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:48px;">What I learned</div>
+    <p class="body-text">Government procurement rules aren't just red tape — they're a moat that makes private-sector speed feel like a superpower. The next company I build will be in the private sector, where ownership compounds.</p>
+  </div>
+
+</div>
+
+<!-- FOOTER NAV -->
+<div class="project-footer fade-up">
+  <a href="index.html#projects" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 7H2M6 3L2 7l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    All work
+  </a>
+  <a href="lace.html" class="next-project">
+    <span class="next-label">Next project</span>
+    <span class="next-name">
+      LACE
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+  </a>
+</div>
+
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+  // JUNTO HERO CANVAS — government network nodes overlaid on photo
+  (function() {
+    const canvas = document.getElementById('junto-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H, nodes = [];
+
+    function resize() {
+      W = canvas.offsetWidth; H = canvas.offsetHeight;
+      canvas.width = W * devicePixelRatio; canvas.height = H * devicePixelRatio;
+      ctx.scale(devicePixelRatio, devicePixelRatio);
+    }
+
+    function initNodes() {
+      nodes = [];
+      const count = Math.max(18, Math.floor(W / 40));
+      for (let i = 0; i < count; i++) {
+        const tier = i === 0 ? 0 : i < 4 ? 1 : 2;
+        nodes.push({
+          x: W * 0.05 + Math.random() * W * 0.9,
+          y: H * 0.1 + Math.random() * H * 0.8,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.15,
+          r: tier === 0 ? 7 : tier === 1 ? 4.5 : 2.5,
+          tier,
+          pulse: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Connections
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i], b = nodes[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          const maxDist = 160;
+          if (dist < maxDist) {
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.strokeStyle = `rgba(200,245,90,${(1 - dist / maxDist) * 0.5})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Nodes
+      nodes.forEach(n => {
+        n.pulse += 0.025;
+        const glow = 0.5 + 0.5 * Math.sin(n.pulse);
+
+        if (n.tier < 2) {
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r + 5 + glow * 4, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(200,245,90,${0.2 * glow})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 1.5);
+        g.addColorStop(0, `rgba(200,245,90,${0.9 - n.tier * 0.2})`);
+        g.addColorStop(1, 'rgba(200,245,90,0)');
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > W) n.vx *= -1;
+        if (n.y < 0 || n.y > H) n.vy *= -1;
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    resize();
+    initNodes();
+    draw();
+    window.addEventListener('resize', () => { resize(); initNodes(); });
+  })();
+</script>
+</body>
+</html>

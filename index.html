@@ -1,725 +1,1327 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Josh Kaplowitz — Operator • Builder</title>
-  <meta name="description" content="Josh Kaplowitz — nuclear-trained submarine officer, builder, aspiring hard-tech founder (nuclear, semis, space)." />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Josh Kaplowitz — Operator · Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  :root {
+    --black: #080808;
+    --off-black: #0f0f0f;
+    --card-bg: #111111;
+    --border: rgba(255,255,255,0.08);
+    --white: #f5f4f0;
+    --dim: rgba(245,244,240,0.45);
+    --accent: #c8f55a;
+    --accent-dim: rgba(200,245,90,0.15);
+    --mono: 'DM Mono', monospace;
+    --serif: 'Instrument Serif', serif;
+    --display: 'Bebas Neue', sans-serif;
+  }
 
-  <style>
-    :root{
-      --bg:#0b0c0f;
-      --card:#10121a;
-      --text:#e9ecf1;
-      --muted:#a6adbb;
-      --faint:#6b7280;
-      --line:rgba(255,255,255,.10);
-      --shadow: 0 12px 40px rgba(0,0,0,.45);
-      --radius:16px;
-      --max:1100px;
-    }
-    *{ box-sizing:border-box; }
-    html{ scroll-behavior:smooth; }
-    body{
-      margin:0;
-      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: radial-gradient(1200px 800px at 75% -10%, rgba(99,102,241,.10), transparent 55%),
-                  radial-gradient(1000px 800px at 10% 10%, rgba(16,185,129,.08), transparent 60%),
-                  var(--bg);
-      color:var(--text);
-      letter-spacing:-0.01em;
-    }
-    a{ color:inherit; text-decoration:none; }
-    a:hover{ opacity:.92; }
+  html { scroll-behavior: smooth; }
 
-    .wrap{
-  max-width:var(--max);
-  margin:0 auto;
-  padding:0 20px 80px; /* kill top padding */
-}
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+  }
 
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s, width 0.2s, height 0.2s, opacity 0.2s;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(200,245,90,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: transform 0.15s ease-out, width 0.25s, height 0.25s, opacity 0.25s;
+  }
+  body:hover .cursor { opacity: 1; }
+  a:hover ~ .cursor, button:hover ~ .cursor { width: 20px; height: 20px; }
 
-    /* Top bar */
-    .top{
-      position:sticky;
-      top:0;
-      z-index:50;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      background: linear-gradient(to bottom, rgba(11,12,15,.85), rgba(11,12,15,.45));
-      border-bottom:1px solid var(--line);
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    mix-blend-mode: normal;
+  }
+  nav::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, transparent 100%);
+    z-index: -1;
+    pointer-events: none;
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .nav-logo:hover { opacity: 1; }
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.2s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    font-family: var(--display);
+    font-size: clamp(160px, 22vw, 340px);
+    letter-spacing: -0.02em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    line-height: 0.9;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+  }
+  .hero-badge::before {
+    content: '';
+    display: block;
+    width: 20px; height: 1px;
+    background: var(--accent);
+  }
+  .hero-name {
+    font-family: var(--display);
+    font-size: clamp(72px, 10vw, 160px);
+    line-height: 0.88;
+    letter-spacing: 0.01em;
+    color: var(--white);
+    margin-bottom: 32px;
+  }
+  .hero-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(18px, 2.2vw, 28px);
+    color: var(--dim);
+    max-width: 680px;
+    line-height: 1.45;
+    margin-bottom: 52px;
+  }
+  .hero-sub em {
+    color: var(--white);
+    font-style: normal;
+  }
+  .hero-cta-row {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: var(--accent);
+    color: var(--black);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(200,245,90,0.25);
+  }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .btn-ghost:hover { color: var(--white); }
+  .btn-ghost svg { transition: transform 0.2s; }
+  .btn-ghost:hover svg { transform: translateX(4px); }
+
+  .hero-stats {
+    position: absolute;
+    right: 48px;
+    bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    text-align: right;
+  }
+  .stat-item {}
+  .stat-num {
+    font-family: var(--display);
+    font-size: 36px;
+    color: var(--white);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-top: 4px;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dim);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--dim), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+  @keyframes scrollPulse {
+    0%,100% { opacity: 0.4; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
+  }
+
+  /* SECTIONS */
+  section { padding: 120px 48px; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 64px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    display: block;
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  /* PROJECTS */
+  #projects { background: var(--off-black); }
+  .projects-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 80px;
+  }
+  .projects-title {
+    font-family: var(--display);
+    font-size: clamp(48px, 6vw, 96px);
+    line-height: 0.9;
+    color: var(--white);
+  }
+  .projects-desc {
+    max-width: 340px;
+    font-size: 13px;
+    color: var(--dim);
+    line-height: 1.6;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+  .project-card {
+    position: relative;
+    background: var(--card-bg);
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    cursor: none;
+    text-decoration: none;
+    display: block;
+  }
+  .project-card.large { grid-column: span 2; aspect-ratio: 16/7; }
+  .project-thumb {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%) brightness(0.7);
+    transition: transform 0.6s cubic-bezier(.25,.46,.45,.94), filter 0.4s;
+  }
+  .project-card:hover .project-thumb {
+    transform: scale(1.04);
+    filter: grayscale(0%) brightness(0.85);
+  }
+  .project-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(8,8,8,0.92) 0%, transparent 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 36px;
+    transition: background 0.3s;
+  }
+  .project-card:hover .project-overlay {
+    background: linear-gradient(to top, rgba(8,8,8,0.97) 0%, rgba(8,8,8,0.2) 60%);
+  }
+  .project-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s 0.05s, transform 0.3s 0.05s;
+  }
+  .project-card:hover .project-tag { opacity: 1; transform: translateY(0); }
+  .project-name {
+    font-family: var(--display);
+    font-size: clamp(28px, 3.5vw, 52px);
+    line-height: 0.95;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .project-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.05em;
+  }
+  .project-arrow {
+    position: absolute;
+    top: 32px; right: 32px;
+    width: 40px; height: 40px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dim);
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s, transform 0.3s, border-color 0.3s, color 0.3s;
+  }
+  .project-card:hover .project-arrow {
+    opacity: 1;
+    transform: translateY(0);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* placeholder gradients for cards without images */
+  .grad-1 { background: linear-gradient(135deg, #0a1628 0%, #1a2f4a 50%, #0d1f35 100%); }
+  .grad-2 { background: linear-gradient(135deg, #1a0a1a 0%, #2d0f3d 50%, #150a20 100%); }
+  .grad-3 { background: linear-gradient(135deg, #0a1a0a 0%, #0f2d1a 50%, #061410 100%); }
+  .grad-4 { background: linear-gradient(135deg, #1a1200 0%, #2d2000 50%, #1a1200 100%); }
+
+  .card-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.04;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,1) 40px, rgba(255,255,255,1) 41px),
+      repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,1) 40px, rgba(255,255,255,1) 41px);
+  }
+
+  /* ABOUT */
+  #about { background: var(--black); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .about-left {}
+  .about-heading {
+    font-family: var(--display);
+    font-size: clamp(48px, 5.5vw, 88px);
+    line-height: 0.9;
+    color: var(--white);
+    margin-bottom: 40px;
+  }
+  .about-body {
+    font-size: 14px;
+    color: var(--dim);
+    line-height: 1.75;
+    margin-bottom: 24px;
+  }
+  .about-body strong { color: var(--white); font-weight: 400; }
+  .about-right { padding-top: 40px; }
+
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 24px;
+    padding: 28px 0;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  .timeline-item:last-child { border-bottom: 1px solid var(--border); }
+  .timeline-year {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    padding-top: 3px;
+  }
+  .timeline-content {}
+  .timeline-role {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--white);
+    margin-bottom: 4px;
+    letter-spacing: 0.03em;
+  }
+  .timeline-org {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .timeline-detail {
+    font-size: 12px;
+    color: var(--dim);
+    line-height: 1.6;
+  }
+
+  .about-personal {
+    margin-top: 64px;
+    padding: 40px;
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .about-personal::before {
+    content: '/ PERSONAL';
+    position: absolute;
+    top: -8px;
+    left: 24px;
+    background: var(--black);
+    padding: 0 8px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+  }
+  .about-personal p {
+    font-size: 13px;
+    color: var(--dim);
+    line-height: 1.7;
+  }
+  .about-personal p strong { color: var(--white); font-weight: 400; }
+
+  /* CREDIBILITY ROW */
+  .cred-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 100px;
+  }
+  .cred-card {
+    background: var(--card-bg);
+    padding: 36px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cred-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.4s;
+  }
+  .cred-card:hover::before { height: 100%; }
+  .cred-num {
+    font-family: var(--display);
+    font-size: 52px;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .cred-num span { color: var(--accent); }
+  .cred-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* CONTACT */
+  #contact {
+    background: var(--off-black);
+    text-align: center;
+    padding: 140px 48px;
+  }
+  .contact-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+  }
+  .contact-heading {
+    font-family: var(--display);
+    font-size: clamp(56px, 8vw, 130px);
+    line-height: 0.88;
+    color: var(--white);
+    margin-bottom: 28px;
+  }
+  .contact-sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--dim);
+    max-width: 480px;
+    margin: 0 auto 56px;
+    line-height: 1.5;
+  }
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 48px;
+  }
+  .social-link {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-decoration: none;
+    padding: 12px 24px;
+    border: 1px solid var(--border);
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .social-link:hover {
+    color: var(--black);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .contact-note {
+    margin-top: 40px;
+    font-size: 11px;
+    color: rgba(245,244,240,0.2);
+    font-style: italic;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--black);
+    padding: 32px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--dim);
+  }
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: rgba(245,244,240,0.2);
+  }
+  .back-top {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .back-top:hover { color: var(--accent); }
+
+  /* ANIMATIONS */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s cubic-bezier(.25,.46,.45,.94), transform 0.8s cubic-bezier(.25,.46,.45,.94);
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+  .fade-up:nth-child(2) { transition-delay: 0.1s; }
+  .fade-up:nth-child(3) { transition-delay: 0.2s; }
+  .fade-up:nth-child(4) { transition-delay: 0.3s; }
+
+  /* NOW / STATUS STRIP */
+  .status-strip {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 50;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* PHOTO */
+  .photo-wrap {
+    width: 100%;
+    aspect-ratio: 3/4;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .photo-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    filter: grayscale(15%);
+  }
+  .photo-placeholder {
+    position: absolute;
+    inset: 0;
+    border: 1px dashed rgba(200,245,90,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 24px,
+      rgba(255,255,255,0.015) 24px,
+      rgba(255,255,255,0.015) 25px
+    );
+  }
+  .photo-placeholder-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--dim);
+  }
+  .photo-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+  .photo-hint {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    opacity: 0.5;
+    letter-spacing: 0.05em;
+  }
+
+  /* RESPONSIVE — TABLET */
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    section { padding: 80px 24px; }
+    #hero { padding: 0 24px 80px; }
+    .hero-stats { display: none; }
+    .about-grid { grid-template-columns: 1fr; gap: 48px; }
+    .project-grid { grid-template-columns: 1fr; }
+    .project-card.large { grid-column: span 1; aspect-ratio: 4/3; }
+    .cred-row { grid-template-columns: repeat(2, 1fr); }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+    .status-strip { display: none; }
+  }
+
+  /* RESPONSIVE — MOBILE (iPhone SE → iPhone Pro Max) */
+  @media (max-width: 600px) {
+    /* Disable custom cursor on touch — restores native tap targets */
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+
+    /* NAV — hamburger-less compact layout */
+    nav {
+      padding: 16px 20px;
+      flex-wrap: wrap;
+      gap: 12px;
     }
-    .top-inner{
-      max-width:var(--max);
-      margin:0 auto;
-      padding:14px 20px;
-      display:flex;
-      align-items:center;
-      gap:14px;
-      justify-content:space-between;
+    .nav-links {
+      gap: 0;
+      width: 100%;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
     }
-    .brand{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      min-width:220px;
-    }
-    .dot{
-      width:10px; height:10px; border-radius:50%;
-      background: linear-gradient(135deg, rgba(99,102,241,1), rgba(16,185,129,1));
-      box-shadow:0 0 0 4px rgba(99,102,241,.12);
-    }
-    .brand b{ font-weight:600; }
-    .brand span{
-      color:var(--muted);
-      font-size:13px;
-      display:block;
-      line-height:1.1;
-      margin-top:2px;
+    .nav-links a {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      padding: 8px 0;
+      min-height: 44px; /* iOS tap target */
+      display: flex;
+      align-items: center;
     }
 
-    .nav{
-      display:flex;
-      gap:16px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
+    /* HERO */
+    #hero {
+      padding: 0 20px 72px;
+      min-height: 100svh; /* use svh to avoid iOS address-bar issues */
+      justify-content: flex-end;
     }
-    .nav a{
-      font-size:13px;
-      color:var(--muted);
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid transparent;
+    .hero-bg-text {
+      font-size: 42vw; /* keep it decorative, won't cause overflow with overflow:hidden on section */
+      opacity: 0.6;
     }
-    .nav a:hover{
-      border-color:var(--line);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
+    .hero-badge {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      margin-bottom: 20px;
+    }
+    .hero-name {
+      font-size: clamp(56px, 18vw, 80px);
+      margin-bottom: 20px;
+    }
+    .hero-sub {
+      font-size: 16px;
+      margin-bottom: 36px;
+    }
+    .hero-cta-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .btn-primary, .btn-ghost {
+      min-height: 48px; /* comfortable touch target */
+      padding: 14px 24px;
+    }
+    .scroll-hint { display: none; }
+
+    /* SECTIONS */
+    section { padding: 64px 20px; }
+
+    /* PROJECTS */
+    .projects-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .projects-title { font-size: 48px; }
+    .projects-desc { max-width: 100%; }
+    .project-card { aspect-ratio: 3/2; }
+    .project-card.large { aspect-ratio: 3/2; }
+    .project-name { font-size: 32px; }
+    .project-overlay { padding: 20px; }
+    .project-arrow { display: none; } /* too small to hit on touch */
+
+    /* ABOUT */
+    .about-heading { font-size: 48px; }
+    .about-personal { padding: 24px 20px; }
+    .timeline-item { grid-template-columns: 72px 1fr; gap: 12px; padding: 20px 0; }
+    .photo-wrap { aspect-ratio: 4/3; margin-bottom: 32px; } /* landscape on mobile — less tall */
+
+    /* CRED ROW */
+    .cred-row {
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 48px;
+    }
+    .cred-card { padding: 24px 20px; }
+    .cred-num { font-size: 40px; }
+
+    /* CONTACT */
+    #contact { padding: 80px 20px; }
+    .contact-heading { font-size: clamp(44px, 14vw, 60px); }
+    .contact-sub { font-size: 15px; }
+    .social-links { gap: 12px; }
+    .social-link {
+      padding: 12px 16px;
+      font-size: 10px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
     }
 
-    /* Hero */
-    .hero{
-      padding:56px 0 28px;
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:24px;
-      align-items:end;
-    }
-    @media (max-width: 900px){
-      .hero{ grid-template-columns:1fr; }
-    }
+    /* FOOTER */
+    footer { padding: 24px 20px; gap: 12px; }
+  }
 
-    .kicker{
-      color:var(--muted);
-      font-size:13px;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      margin-bottom:14px;
-    }
-    h1{
-      font-size: clamp(44px, 5vw, 72px);
-      line-height:1.0;
-      margin:0 0 18px;
-      letter-spacing:-0.03em;
-      font-weight:600;
-    }
-    .sub{
-      color:var(--muted);
-      font-size:16px;
-      line-height:1.6;
-      max-width:64ch;
-      margin:0 0 22px;
-    }
-    .cta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-    }
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 14px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      font-size:13px;
-    }
-    .btn:hover{ background:rgba(255,255,255,.06); }
-    .btn.primary{
-      border-color:transparent;
-      background: linear-gradient(135deg, rgba(99,102,241,.9), rgba(16,185,129,.85));
-      color:#071016;
-      font-weight:600;
-    }
+  /* VERY SMALL (iPhone SE, 375px) */
+  @media (max-width: 390px) {
+    .hero-name { font-size: 52px; }
+    .projects-title { font-size: 40px; }
+    .about-heading { font-size: 40px; }
+    .contact-heading { font-size: 40px; }
+    .cred-row { grid-template-columns: 1fr 1fr; }
+    .nav-links a { font-size: 9px; }
+  }
+  /* PROJECT THUMB — absolute fill */
+  .project-thumb {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(20%) brightness(0.65);
+    transition: transform 0.6s cubic-bezier(.25,.46,.45,.94), filter 0.4s;
+    z-index: 0;
+  }
+  .project-card:hover .project-thumb {
+    transform: scale(1.04);
+    filter: grayscale(0%) brightness(0.8);
+  }
 
-    .sidecard{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.02);
-      border-radius: var(--radius);
-      padding:18px;
-      box-shadow: var(--shadow);
-    }
-    .sidecard .row{
-      display:flex;
-      justify-content:space-between;
-      gap:14px;
-      padding:10px 0;
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .sidecard .row:last-child{ border-bottom:none; padding-bottom:0; }
-    .label{ color:var(--faint); font-size:12px; text-transform:uppercase; letter-spacing:.12em; }
-    .value{ color:var(--text); font-size:13px; text-align:right; }
+  /* Fallback gradient — hidden once has-image */
+  .card-bg-fallback {
+    position: absolute; inset: 0; z-index: 0;
+  }
+  .project-card.has-image .card-bg-fallback { display: none; }
 
-    /* Sections */
-    section{
-      padding:28px 0;
-      border-top:1px solid var(--line);
-    }
-    .h2{
-      display:flex;
-      align-items:baseline;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:18px;
-    }
-    .h2 h2{
-      font-size:18px;
-      margin:0;
-      font-weight:600;
-      letter-spacing:-0.01em;
-    }
-    .h2 p{
-      margin:0;
-      color:var(--muted);
-      font-size:13px;
-      max-width:76ch;
-      text-align:right;
-    }
-    @media (max-width: 800px){
-      .h2{ flex-direction:column; align-items:flex-start; }
-      .h2 p{ text-align:left; }
-    }
+  /* Overlay + arrow on top */
+  .project-overlay { z-index: 2; }
+  .project-arrow { z-index: 3; }
 
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap:14px;
-    }
+  /* ── ANIMATED LOGO BADGE ── */
+  .card-logo-badge {
+    position: absolute;
+    top: 24px; left: 24px;
+    z-index: 4;
+    width: 64px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+  }
 
-    .card{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.02);
-      border-radius: var(--radius);
-      padding:18px;
-      box-shadow: var(--shadow);
-      position:relative;
-      overflow:hidden;
-      min-height:110px;
-    }
-    .card:hover{
-      transform: translateY(-2px);
-      transition: transform .18s ease;
-      background: rgba(255,255,255,.03);
-    }
+  /* spinning outer ring */
+  .card-logo-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(200,245,90,0.0);
+    transition: border-color 0.3s;
+    animation: badgeSpin 6s linear infinite;
+    animation-play-state: paused;
+    background: conic-gradient(
+      from 0deg,
+      rgba(200,245,90,0.5) 0%,
+      transparent 40%
+    );
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #fff calc(100% - 2px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #fff calc(100% - 2px));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .project-card:hover .card-logo-ring {
+    opacity: 1;
+    animation-play-state: running;
+  }
+  @keyframes badgeSpin {
+    to { transform: rotate(360deg); }
+  }
 
-    .card .tag{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      font-size:12px;
-      color:var(--muted);
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.02);
-      padding:6px 10px;
-      border-radius:999px;
-      margin-bottom:12px;
-      width:fit-content;
-    }
-    .card h3{
-      margin:0 0 10px;
-      font-size:16px;
-      font-weight:600;
-      letter-spacing:-0.01em;
-    }
-    .card p{
-      margin:0;
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.6;
-    }
-    .meta{
-      margin-top:14px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-    .pill{
-      font-size:12px;
-      color:var(--muted);
-      border:1px solid rgba(255,255,255,.08);
-      padding:6px 10px;
-      border-radius:999px;
-      background: rgba(255,255,255,.01);
-    }
+  /* logo image inside badge */
+  .card-logo-img {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    position: relative; z-index: 1;
+  }
+  .project-card:hover .card-logo-img {
+    transform: scale(1.1);
+    box-shadow: 0 4px 24px rgba(200,245,90,0.25);
+  }
 
-    .col-7{ grid-column: span 7; }
-    .col-5{ grid-column: span 5; }
-    .col-6{ grid-column: span 6; }
-    .col-4{ grid-column: span 4; }
-    .col-12{ grid-column: span 12; }
-    @media (max-width: 900px){
-      .col-7,.col-5,.col-6,.col-4{ grid-column: span 12; }
-    }
+  /* Nuclear SVG badge (no image) */
+  .card-logo-svg {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: rgba(8,8,8,0.7);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+    position: relative; z-index: 1;
+    border: 1px solid rgba(200,245,90,0.2);
+  }
+  .project-card:hover .card-logo-svg {
+    transform: scale(1.1);
+    box-shadow: 0 4px 24px rgba(200,245,90,0.2);
+  }
+  /* Nuclear SVG ellipses spin on hover */
+  #nuclear-badge .card-logo-svg svg {
+    transition: transform 0.6s;
+  }
+  #nuclear-badge:hover .card-logo-svg svg {
+    transform: rotate(30deg);
+  }
 
-    /* Timeline */
-    .timeline{ display:grid; gap:10px; }
-    .titem{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:14px;
-      padding:14px 16px;
-      background: rgba(255,255,255,.015);
-    }
-    .trow{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:6px;
-    }
-    .trow b{ font-weight:600; }
-    .trow span{ color:var(--muted); font-size:13px; }
-    .titem p{ margin:0; color:var(--muted); font-size:14px; line-height:1.6; }
+  /* On mobile — badges always slightly visible, smaller */
+  @media (max-width: 600px) {
+    .card-logo-badge { width: 48px; height: 48px; top: 16px; left: 16px; }
+    .card-logo-img { width: 40px; height: 40px; }
+    .card-logo-svg { width: 40px; height: 40px; }
+    .card-logo-ring { opacity: 0.4; animation-play-state: running; }
+  }
 
-    /* Footer */
-    footer{
-      border-top:1px solid var(--line);
-      padding-top:20px;
-      margin-top:30px;
-      color:var(--muted);
-      font-size:13px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    /* Reveal */
-    .reveal{ opacity:0; transform: translateY(10px); }
-    .reveal.on{ opacity:1; transform:none; transition: opacity .55s ease, transform .55s ease; }
-
-    /* Small utility */
-    .small{ color:var(--faint); font-size:12px; line-height:1.5; margin-top:10px; }
-	.hero-aside{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-/* Portrait container */
-.hero-photo{
-  border-radius:16px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,.10);
-  box-shadow:0 18px 55px rgba(0,0,0,.55);
-  background:rgba(255,255,255,.02);
-}
-
-/* Image itself */
-.hero-photo img{
-  width:100%;
-  display:block;
-  object-fit:cover;
-  filter: grayscale(100%) contrast(1.05);
-}
-
-  </style>
+</style>
 </head>
-
 <body>
-  <div class="top">
-    <div class="top-inner">
-      <div class="brand">
-        <div class="dot"></div>
-        <div>
-          <b>Josh Kaplowitz</b>
-          <span>Operator • Builder</span>
-        </div>
-      </div>
-      <nav class="nav" aria-label="Primary">
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-      </nav>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- STATUS STRIP -->
+<div class="status-strip">
+  <div class="status-dot"></div>
+  Active-duty Navy · Building toward launch
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">J. Kaplowitz</a>
+  <ul class="nav-links">
+    <li><a href="#projects">Work</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-text" aria-hidden="true">OPERATOR</div>
+
+  <div class="hero-badge">Nuclear Submarine Officer · USN</div>
+
+  <h1 class="hero-name">JOSH<br>KAPLOWITZ</h1>
+
+  <p class="hero-sub">
+    I drive submarines and operate nuclear reactors.<br>
+    I build companies. <em>Next: hard-tech.</em>
+  </p>
+
+  <div class="hero-cta-row">
+    <a href="#projects" class="btn-primary">
+      See the work
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#contact" class="btn-ghost">
+      Get in touch
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">11</div>
+      <div class="stat-label">Years in the Navy</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">$1M<span style="font-size:24px;color:var(--accent)">+</span></div>
+      <div class="stat-label">Raised in uniform</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">315</div>
+      <div class="stat-label">lbs bench press</div>
     </div>
   </div>
 
-  <main class="wrap">
-    <!-- HERO -->
-    <header class="hero">
-      <div>
-        <div class="kicker">Nuclear Submarine officer • USNA CS • $1M+ RAISED</div>
-        <h1>Building and operating in extreme environments.</h1>
-        <p class="sub">
-          I’m Josh. I drive submarines and operate nuclear reactors in the world's harshest environments, safeguarding national security.
-          I studied computer science in college, built apps I pitched to the Undersecretary of the Navy, Chief of Naval Research,
-		  and Chief of Naval Operations and apps for the private sector, collectively raising over $1M+.
-          I’m building a hard-tech company spanning <b>energy</b>, <b>manufacturing</b>, and <b>frontier systems</b>.
+  <div class="scroll-hint" aria-hidden="true">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">Work</div>
+
+  <div class="projects-header fade-up">
+    <h2 class="projects-title">SELECTED<br>PROJECTS</h2>
+    <p class="projects-desc">Concept → momentum → real outcomes. The point is shipping.</p>
+  </div>
+
+  <div class="project-grid">
+
+    <!-- JUNTO -->
+    <a href="junto.html" class="project-card large fade-up">
+      <img class="project-thumb" src="_MAX2727.jpeg" alt="JUNTO — pitching at Naval Academy">
+      <div class="card-bg-fallback grad-1"><div class="card-pattern"></div></div>
+      <!-- Animated logo badge -->
+      <div class="card-logo-badge" id="junto-badge">
+        <div class="card-logo-ring"></div>
+        <img src="juntoIcon.png" alt="JUNTO" class="card-logo-img">
+      </div>
+      <div class="project-overlay">
+        <div class="project-tag">Defense / GovTech · $569K → $1M+</div>
+        <div class="project-name">JUNTO</div>
+        <div class="project-sub">Funded Navy program · Pitched to CNO & Undersecretary of the Navy</div>
+      </div>
+      <div class="project-arrow">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12L12 2M12 2H5M12 2v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+
+    <!-- LACE -->
+    <a href="lace.html" class="project-card fade-up">
+      <img class="project-thumb" src="IMG_1159.jpeg" alt="LACE app" style="object-position:center top;">
+      <div class="card-bg-fallback grad-2"><div class="card-pattern"></div></div>
+      <div class="card-logo-badge" id="lace-badge">
+        <div class="card-logo-ring"></div>
+        <img src="lacelogo.JPG" alt="LACE" class="card-logo-img">
+      </div>
+      <div class="project-overlay">
+        <div class="project-tag">Consumer / Social · Angel-backed</div>
+        <div class="project-name">LACE</div>
+        <div class="project-sub">Audio-based social app · CNN/NYT-level press</div>
+      </div>
+      <div class="project-arrow">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12L12 2M12 2H5M12 2v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+
+    <!-- HARD TECH -->
+    <a href="nuclear.html" class="project-card fade-up">
+      <div class="card-bg-fallback grad-3"><div class="card-pattern"></div></div>
+      <!-- Nuclear: SVG atom icon as animated badge -->
+      <div class="card-logo-badge" id="nuclear-badge">
+        <div class="card-logo-ring"></div>
+        <div class="card-logo-svg">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <circle cx="18" cy="18" r="4" fill="#c8f55a"/>
+            <ellipse cx="18" cy="18" rx="15" ry="6" stroke="#c8f55a" stroke-width="1.2" opacity="0.7"/>
+            <ellipse cx="18" cy="18" rx="15" ry="6" stroke="#c8f55a" stroke-width="1.2" opacity="0.7" transform="rotate(60 18 18)"/>
+            <ellipse cx="18" cy="18" rx="15" ry="6" stroke="#c8f55a" stroke-width="1.2" opacity="0.7" transform="rotate(120 18 18)"/>
+          </svg>
+        </div>
+      </div>
+      <div class="project-overlay">
+        <div class="project-tag">Hard-Tech · In Progress</div>
+        <div class="project-name">NUCLEAR ×<br>MFG SCALE</div>
+        <div class="project-sub">Post-Navy venture · Energy, manufacturing, frontier systems</div>
+      </div>
+      <div class="project-arrow">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12L12 2M12 2H5M12 2v7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">About</div>
+
+  <div class="about-grid">
+    <div class="about-left fade-up">
+      <h2 class="about-heading">OPERATOR<br>BUILDER</h2>
+      <p class="about-body">
+        I'm Josh Kaplowitz — a nuclear-trained U.S. Naval submarine officer with a computer science background
+        and a track record of operating in <strong>high-consequence environments</strong>.
+      </p>
+      <p class="about-body">
+        Garbage truck → enlisted sailor → USNA CS → Naval Reactors → nuclear submarine officer.
+        Outside the Navy, I've built and launched products, <strong>raised early capital</strong>, and pitched senior leaders.
+      </p>
+      <p class="about-body">
+        I'm focused on hard tech — energy, manufacturing, and frontier systems — and building toward
+        a post-Navy transition into launching my own company.
+      </p>
+
+      <div class="about-personal">
+        <p>
+          Voracious reader, love lifting weights, and traveling. Top 3 books: <strong>Plutarch's Lives, The Fountainhead, The Twelve Caesars</strong>.
+          Just hit 315 on bench. Trying to hit 365 in 2026.
         </p>
-
-        <div class="cta">
-          <a class="btn primary" href="#projects">See projects</a>
-          <a class="btn" href="#contact">Get in touch</a>
-          <!-- Replace placeholders -->
-          <a class="btn" href="https://www.linkedin.com/in/joshua-kaplowitz-22a032170/"; return false;">LinkedIn</a>
-          <a class="btn" href="https://x.com/jjkaplowitz"; return false;">X</a>
-          <a class="btn" href="https://www.instagram.com/jjkaplowitz?igsh=MWw1c2FseWljamxi&utm_source=qr"; return false;">Instagram</a>
-        </div>
-
-        <div class="small">
-          *This site intentionally keeps operational details high-level. If you’re recruiting, investing, or collaborating,
-          reach out and I’ll share specifics.
-        </div>
       </div>
-
-      <aside class="hero-aside reveal">
-
-  <!-- Portrait photo -->
-  <div class="hero-photo">
-    <img src="assets/portrait.jpeg" alt="Josh Kaplowitz portrait">
-  </div>
-
-  <!-- Existing sidecard -->
-  <div class="sidecard">
-    <div class="row">
-      <div class="label">Now</div>
-      <div class="value">Active-duty Navy • building leverage daily</div>
     </div>
-    <div class="row">
-      <div class="label">Path</div>
-      <div class="value">Leave Navy → build full-time</div>
-    </div>
-    <div class="row">
-      <div class="label">North star</div>
-      <div class="value">Nuclear × Space</div>
-    </div>
-    <div class="row">
-      <div class="label">Target</div>
-      <div class="value">2026–2027 launch</div>
-    </div>
-  </div>
 
-</aside>
+    <div class="about-right fade-up">
 
-    </header>
-
-    <!-- ABOUT -->
-    <section id="about">
-      <div class="h2">
-        <h2>About</h2>
-        <p>From garbage truck → enlisted sailor → USNA CS → nuclear submarine officer.</p>
-      </div>
-
-      <div class="grid">
-        <div class="card col-7 reveal">
-          <div class="tag">Operator → Builder</div>
-          <h3>High standards, real systems</h3>
-          <p>
-            I’m Josh Kaplowitz, a nuclear-trained U.S. Naval submarine officer with a computer science background
-            and a track record of operating in high-consequence environments.
-          </p>
-          <p style="margin-top:10px;">
-            I started as a garbage man initially, enlisted in the Navy in 2015, worked on the USS GERALD R. FORD
-            maintaining mission-critical networks, and earned an appointment to the U.S. Naval Academy where I studied
-            Computer Science (Class of 2022).
-          </p>
-          <p style="margin-top:10px;">
-            Since then I’ve worked inside Naval Reactors in Washington, DC, completed the Navy's intense nuclear training program,
-            and now lead technical teams on a nuclear-powered submarine. Outside the Navy, I’ve built and launched
-            products, raised early capital, and pitched senior leaders. I’m focused on hard tech (energy, manufacturing,
-            and frontier systems) and I’m building toward a post-Navy transition into launching my own company.
-          </p>
-        </div>
-
-        <div class="card col-5 reveal">
-          <div class="tag">Personal</div>
-          <h3>For fun</h3>
-          <p>
-            I'm a voracious reader, love lifting weights, and traveling. I read everything from Greco-Roman history to Sci-Fi to
-			every type of biography and business book you can think of. Top 3 favorite books are Plutarch's Lives, The Fountainhead and
-			The Twelve Caesars. Just hit 315 on bench and trying to hit 365 in 2026!
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- WORK -->
-    <section id="work">
-      <div class="h2">
-        <h2>Work</h2>
-        <p>High-accountability roles. Technical teams. Shipped outcomes.</p>
+      <!-- PHOTO -->
+      <div class="photo-wrap">
+        <img
+          id="portrait"
+          src="IMG_9858.jpg"
+          alt="Josh Kaplowitz"
+        />
       </div>
 
       <div class="timeline">
-        <div class="titem reveal">
-          <div class="trow">
-            <b>Nuclear Submarine Officer — Machinery / Propulsion (Nuclear) and Tactical Systems (Torpedo and Missile)</b>
-            <span>2024–Present</span>
-          </div>
-		  <div class="trow">
-			<span>KINGS BAY, GA</span>
-		  </div>
-          <p>
-			Led and developed 30 nuclear mechanics that were responsible for operating and maintaining all the nuclear propulsion
-			and shipboard mechanical systems. I personally oversaw major maintenance on several critical mechanical systems required
-			for reactor safety. Now I lead and train 50 personel across 4 teams in Weapons department to maintain our weapons systems
-			and our tactical skills ready for war.
-          </p>
-        </div>
 
-        <div class="titem reveal">
-          <div class="trow">
-            <b>Naval Reactors — Software & Program Execution</b>
-            <span>2022–2023</span>
-          </div>
-		  <div class="trow">
-			<span>WASHINGTON, DC</span>
-		  </div>
-          <p>
-            Built internal tooling and project-management software to improve execution inside a mission-critical organization.
-            Learned how real institutions move: governance, requirements, stakeholder alignment, and delivery.
-          </p>
-        </div>
-
-        <div class="titem reveal">
-          <div class="trow">
-            <b>U.S. Naval Academy — Computer Science</b>
-            <span>2018-2022</span>
-          </div>
-		  <div class="trow">
-			<span>ANNAPOLIS, MD</span>
-		  </div>
-          <p>
-            Computer science foundation with a bias toward building. Entrepreneurship Club President. Skateboarding Club President.
-          </p>
-        </div>
-
-        <div class="titem reveal">
-          <div class="trow">
-            <b>USS GERALD R. FORD (Enlisted) — Shipboard Networks / Operations</b>
-            <span>2015–2017</span>
-          </div>
-		  <div class="trow">
-			<span>NEWPORT NEWS, VA</span>
-		  </div>
-          <p>
-            Maintained and operated major shipboard networks in a high-tempo environment where reliability is the product.
-            Lived with 50 other guys in a bunkroom aboard.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects">
-      <div class="h2">
-        <h2>Selected projects</h2>
-        <p>Concept → momentum → real outcomes. The point is shipping.</p>
-      </div>
-
-      <div class="grid">
-        <div class="card col-6 reveal">
-          <div class="tag">Defense / GovTech</div>
-          <h3>JUNTO — funded Navy program</h3>
-          <p>
-            JUNTO started as a product idea, then became a real program. I built the application, pitched it to senior Navy leadership
-            (including the Undersecretary of the Navy and the CNO in 2020), secured <b>$569K</b> in initial funding, and helped drive it into a
-            <b>million-dollar project</b>.
-          </p>
-          <p style="margin-top:10px;">
-            I learned a lot working on this project and was almost kicked out of the Naval Academy for it. Over the next 2-3 years I led an entire
-			software team based out of Georgia Tech. It was extremely painful to work within the confines of the government procurement rules.
-			When we ran out of money, the team was legally not allowed to work on the app until new funding came which could take a month or more.
-			The project was turned over to someone else and I realized the next project I was going to build was going to be in the private sector.
-          </p>
-        </div>
-
-        <div class="card col-6 reveal">
-          <div class="tag">Consumer / Social</div>
-          <h3>LACE — audio-based social app</h3>
-          <p>
-            Built and launched an audio social product, raised angel investment, and attracted attention from high-profile reporters
-            (CNN / NYT-level). It was a crash course in distribution, retention, and the difference between “cool” and “needed.”
-          </p>
-        </div>
-
-        <div class="card col-7 reveal">
-          <div class="tag">Hard-Tech Thesis</div>
-          <h3>Nuclear × manufacturing scale</h3>
-          <p>
-            I’m building toward a serious hard-tech company post-Navy. The obsession is execution at infrastructure scale:
-            regulation, supply chain, QA, cost curves, and capital formation; not just demos.
-          </p>
-          <p style="margin-top:10px;">
-            I’m particularly interested in nuclear energy (SMRs), industrial manufacturing systems, and adjacent frontier areas like
-            semiconductors and space; arenas where long-term thinking and disciplined execution win.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- HIGHLIGHTS -->
-    <section id="highlights">
-      <div class="h2">
-        <h2>Credibility</h2>
-        <p>Fast signal for recruiters, collaborators, and investors.</p>
-      </div>
-
-      <div class="grid">
-        <div class="card col-4 reveal">
-          <div class="tag">Leadership</div>
-          <h3>High consequence operations</h3>
-          <p>
-            I have worked in the most stressful environments in the world. If I mess up, the reactor could be damaged,
-			the submarine could sink, people could die. I thrive in the dark moments.
-          </p>
-        </div>
-
-        <div class="card col-4 reveal">
-          <div class="tag">Build</div>
-          <h3>Funded outcomes</h3>
-          <p>
-            JUNTO secured <b>$569K</b> funding and became a <b>$1M+</b> program after being pitched to senior Navy leadership.
-          </p>
-        </div>
-
-        <div class="card col-4 reveal">
-          <div class="tag">Startup</div>
-          <h3>Real-world traction</h3>
-          <p>
-            Built and launched LACE, raised angels, and built a network that included major reporters.
-          </p>
-        </div>
-
-        <div class="card col-6 reveal">
-          <div class="tag">Trajectory and Ethos</div>
-          <h3>Leave Navy → full-time build</h3>
-          <p>
-            Plan: finish my Navy tour strong, compound leverage (technical depth, credibility, relationships), and build
-			an industrial company that meaningfully advances civilization. I’m not interested in novelty apps or marginal conveniences.
-
-			<p style="margin-top:10px;">
-			I’m focused on physical technologies (energy, manufacturing, and frontier systems) that expand what humanity can do and where it can go.
-			I didn’t start with advantages. I grew up rural, nearly failed out of high school, worked as a garbage man, and enlisted in the Navy
-			because I wanted responsibility and a mission larger than myself. Since then, I’ve lived in more than ten states, traveled extensively,
-			led sailors, and earned the chance to operate and supervise nuclear propulsion systems aboard submarines.
-			I was told not to apply to the Naval Academy because I “wouldn’t get in.” I never expected
-			to become a nuclear engineer responsible for systems where failure is not an option but that responsibility is exactly what I seek.
-			I believe leadership is earned through competence, judgment, and long-term thinking. I know I can do more, and I am building toward
-			becoming a world-class leader in technology and industry.
-			</p>
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOCUS -->
-    <section id="focus">
-      <div class="h2">
-        <h2>Focus areas</h2>
-        <p>What I’m compounding: technical depth, founder credibility, and high-agency execution.</p>
-      </div>
-
-      <div class="grid">
-        <div class="card col-4 reveal">
-          <div class="tag">Energy</div>
-          <h3>Nuclear</h3>
-          <p>
-            Fundamentals first: electrical theory, mechanics, reactor dynamics, materials, chemistry; then translate that into a
-            wedge that wins in the real world.
-          </p>
-        </div>
-
-        <div class="card col-4 reveal">
-          <div class="tag">Industry</div>
-          <h3>Manufacturing & supply chains</h3>
-          <p>
-            Components, qualification, QA, schedule, cost curves. Physical systems scale when the boring details are mastered.
-          </p>
-        </div>
-
-        <div class="card col-4 reveal">
-          <div class="tag">Frontier</div>
-          <h3>Semis & space</h3>
-          <p>
-            The arenas that reward long-term thinking: compute, energy density, and industrial capability. Hard mode by design.
-          </p>
-        </div>
-
-        <div class="card col-7 reveal">
-          <div class="tag">Operating system</div>
-          <h3>How I work</h3>
-          <p>
-            I’m consistent and have a history of sticking to my mission: 11 years in the Navy, been in the gym over 13 years consistently.
-			My next business I plan to work on for the next 50+ years. I'm in it for the long haul.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact">
-      <div class="h2">
-        <h2>Contact</h2>
-        <p>If you’re building in hard tech, defense, energy, or industrial systems, I want to meet you.</p>
-      </div>
-
-      <div class="grid">
-        <div class="card col-7 reveal">
-          <div class="tag">Message</div>
-          <h3>Let’s talk</h3>
-          <p>
-            Best way: DM me on IG or X. Include what you’re building, where you’re based, and the fastest path to a meaningful next step.
-          </p>
-          <div class="meta">
-            <!-- <span class="pill">Email: yourname@domain.com</span> -->
-            <span class="pill">Base: East Coast Navy • SV and Gundo orbit</span>
+        <div class="timeline-item">
+          <div class="timeline-year">2024–<br>Present</div>
+          <div class="timeline-content">
+            <div class="timeline-role">Nuclear Submarine Officer</div>
+            <div class="timeline-org">USS Florida SSGN · Jacksonville, FL</div>
+            <div class="timeline-detail">Lead 50 personnel across 4 teams in Weapons dept. Previously led 30 nuclear mechanics in Machinery / Propulsion.</div>
           </div>
         </div>
 
-        <div class="card col-5 reveal">
-          <div class="tag">Links</div>
-          <h3>Find me</h3>
-          <p style="margin-bottom:12px;">I'm very active on social media</p>
-          <div class="meta">
-            <a class="btn" href="https://www.linkedin.com/in/joshua-kaplowitz-22a032170/"; return false;">LinkedIn</a>
-          	<a class="btn" href="https://x.com/jjkaplowitz"; return false;">X</a>
-          	<a class="btn" href="https://www.instagram.com/jjkaplowitz?igsh=MWw1c2FseWljamxi&utm_source=qr"; return false;">Instagram</a>
+        <div class="timeline-item">
+          <div class="timeline-year">2022–<br>2023</div>
+          <div class="timeline-content">
+            <div class="timeline-role">Software & Program Execution</div>
+            <div class="timeline-org">Naval Reactors · Washington, DC</div>
+            <div class="timeline-detail">Built internal tooling and project-management software inside a mission-critical organization.</div>
           </div>
         </div>
+
+        <div class="timeline-item">
+          <div class="timeline-year">2018–<br>2022</div>
+          <div class="timeline-content">
+            <div class="timeline-role">Computer Science</div>
+            <div class="timeline-org">U.S. Naval Academy · Annapolis</div>
+            <div class="timeline-detail">CS foundation with a bias toward building. Entrepreneurship Club President. Skateboarding Club President.</div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-year">2015–<br>2017</div>
+          <div class="timeline-content">
+            <div class="timeline-role">Shipboard Networks (Enlisted)</div>
+            <div class="timeline-org">USS Gerald R. Ford</div>
+            <div class="timeline-detail">Maintained and operated major shipboard networks in a high-tempo environment.</div>
+          </div>
+        </div>
+
       </div>
-    </section>
+    </div>
+  </div>
 
-    <footer>
-      <div>© <span id="year"></span> Josh Kaplowitz</div>
-      <!-- <div style="color:var(--faint);">Single-file site • fast deploy on GitHub Pages</div> -->
-    </footer>
-  </main>
+  <!-- CREDIBILITY ROW -->
+  <div class="cred-row fade-up">
+    <div class="cred-card">
+      <div class="cred-num">$1M<span>+</span></div>
+      <div class="cred-label">Raised in uniform</div>
+    </div>
+    <div class="cred-card">
+      <div class="cred-num">11</div>
+      <div class="cred-label">Years of service</div>
+    </div>
+    <div class="cred-card">
+      <div class="cred-num">315</div>
+      <div class="cred-label">Bench press (lbs)</div>
+    </div>
+    <div class="cred-card">
+      <div class="cred-num">2027</div>
+      <div class="cred-label">Launch target</div>
+    </div>
+  </div>
+</section>
 
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-eyebrow">Let's talk</div>
+  <h2 class="contact-heading">GET IN<br>TOUCH</h2>
+  <p class="contact-sub">
+    If you're building in hard tech, defense, energy, or industrial systems — I want to meet you.
+  </p>
 
-    // Reveal on scroll
-    const els = Array.from(document.querySelectorAll('.reveal'));
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
-    }, { threshold: 0.12 });
-    els.forEach(el => io.observe(el));
-  </script>
+  <a href="/cdn-cgi/l/email-protection#ed8787868c9d81829a849997ad8a808c8481c38e8280" class="btn-primary" style="display:inline-flex;margin:0 auto;">
+    Send an email
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+
+  <div class="social-links">
+    <a href="https://www.linkedin.com/in/joshua-kaplowitz-22a032170/" target="_blank" class="social-link">LinkedIn</a>
+    <a href="https://x.com/jjkaplowitz" target="_blank" class="social-link">X / Twitter</a>
+    <a href="https://www.instagram.com/jjkaplowitz" target="_blank" class="social-link">Instagram</a>
+  </div>
+
+  <p class="contact-note">
+    This site intentionally keeps operational details high-level. If you're recruiting, investing, or collaborating,
+    reach out and I'll share specifics.
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-name">Josh Kaplowitz</span>
+  <a href="#hero" class="back-top">
+    Back to top
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 10V2M2 6l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  <span class="footer-copy">© 2025 — Operator · Builder</span>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // CURSOR — desktop only (skip on touch devices)
+  const isTouch = window.matchMedia('(pointer: coarse)').matches;
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+
+  if (!isTouch) {
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+
+    function animRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animRing);
+    }
+    animRing();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '20px';
+        cursor.style.height = '20px';
+        ring.style.width = '56px';
+        ring.style.height = '56px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '10px';
+        cursor.style.height = '10px';
+        ring.style.width = '36px';
+        ring.style.height = '36px';
+      });
+    });
+  } else {
+    // Touch: hide cursor elements, restore default cursor
+    cursor.style.display = 'none';
+    ring.style.display = 'none';
+    document.body.style.cursor = 'auto';
+  }
+
+  // SCROLL FADE-IN
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+  // HERO parallax on bg text
+  const bgText = document.querySelector('.hero-bg-text');
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (bgText) bgText.style.transform = `translate(-50%, calc(-55% + ${y * 0.25}px))`;
+  });
+
+  // PROJECT CARD IMAGES — hide fallback when real image loaded
+  document.querySelectorAll('.project-card').forEach(card => {
+    const img = card.querySelector('.project-thumb');
+    if (!img) return;
+    const activate = () => { if (img.naturalWidth > 0) card.classList.add('has-image'); };
+    if (img.complete) activate(); else img.addEventListener('load', activate);
+  });
+</script>
 </body>
 </html>
